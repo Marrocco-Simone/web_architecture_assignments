@@ -1,0 +1,95 @@
+\subsection{Game code}
+\begin{lstlisting}[language=java, caption={POST method for game page}]
+@Override
+protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    UserSession user = Main.getUserSession(req, res);
+    if (user == null) return;
+
+    Enumeration<String> param_names = req.getParameterNames();
+    boolean guessed_all = true;
+    while(param_names.hasMoreElements()){
+        String param_name = param_names.nextElement();
+        String param_value = req.getParameter(param_name);
+        if(!param_value.equals(param_name)){
+            guessed_all = false;
+            break;
+        }
+    }
+
+    int added_points = 0;
+    if(guessed_all) added_points = 3;
+    else if(user.getPoints() > 0) added_points = -1;
+    user.setPoints(user.getPoints() + added_points);
+
+    synchronized (getServletContext()) {
+        ServletContext context = getServletContext();
+        Object loggedAttribute =  context.getAttribute("logged");
+        @SuppressWarnings("unchecked")
+        List<UserSession> logged = (ArrayList<UserSession>) loggedAttribute;
+
+        for (UserSession logged_user: logged) {
+            if(logged_user.getUsername().equals(user.getUsername())) {
+                logged_user.setPoints(user.getPoints());
+                break;
+            }
+        }
+
+        System.out.println(user.getUsername() + " made " + added_points + " points");
+        System.out.println("new context: " + logged);
+        System.out.println();
+        context.setAttribute("logged", logged);
+    }
+
+    HttpSession session = req.getSession();
+    session.setAttribute("points", user.getPoints());
+    res.sendRedirect(req.getContextPath());
+}
+\end{lstlisting}
+\begin{lstlisting}[language=html, caption={game.jsp code}]
+<%
+  Capitals cap = new Capitals();
+  UserSession userCredentials = Main.getUserSession(request, response);
+  if (userCredentials == null) return;
+%>
+<html>
+<head>
+  <title>Flag Game</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body class="game-body">
+  <header><%=userCredentials.getUsername()%></header>
+
+  <div class="capitals-list">
+      <p>List of cities</p>
+      <ol start="0">
+          <% for(String capital: cap.getCapitals()) { %>
+          <li><%=capital%></li>
+          <% } %>
+      </ol>
+  </div>
+
+  <form action="game" method="POST" class="game-form">
+      <% for(String capital: cap.getChosenCapitals()){ %>
+          <div class="game-input">
+              <label for="<%=capital%>">
+                  <img 
+                      src="flags/<%=capital%>.png" 
+                      width="150" 
+                      height="100" 
+                      alt="Refresh the page"
+                  />
+              </label>
+              <input 
+                  id="<%=capital%>"
+                  name="<%=cap.findCapitalId(capital)%>"
+                  type="number" 
+                  required min="0" 
+                  max="<%=cap.getNCapitals()%>"
+              />
+          </div>
+      <% } %>
+      <button type="submit">Submit Responses</button>
+  </form>
+</body>
+</html>
+\end{lstlisting}

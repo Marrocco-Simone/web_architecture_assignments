@@ -1,0 +1,61 @@
+\documentclass[12pt, a4paper]{article}
+\usepackage{graphicx}
+\graphicspath{ {./imgs/} }
+\usepackage{float}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codeorange}{rgb}{1,0.49,0}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.96}
+
+\lstset{
+  backgroundcolor=\color{backcolour},   
+  commentstyle=\color{codegray},
+  keywordstyle=\color{codeorange},
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codegreen},
+  basicstyle=\ttfamily\footnotesize,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=b,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2,
+  xleftmargin=10pt,
+}
+\renewcommand{\lstlistingname}{Code}
+
+\counterwithin{figure}{section}
+
+%to write code:
+%\begin{lstlisting}[language=java, caption={my caption}]
+%    
+%\end{lstlisting}
+
+%to insert an image
+%\begin{figure}[H]
+%  \centering
+%  \includegraphics[width=\columnwidth]{img.png}
+%  \caption{description of the image}
+%\end{figure}
+
+\title{Web Architectures - Delivery 1}
+\author{Marrocco Simone}
+
+\begin{document}
+  \maketitle
+  \begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{unitn.png}
+  \end{figure}
+  \tableofcontents
+  \pagebreak
+
+  
+\end{document}

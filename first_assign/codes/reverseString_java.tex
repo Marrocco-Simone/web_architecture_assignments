@@ -1,0 +1,11 @@
+\begin{lstlisting}[language=java, caption={Class that reverses a string}]
+package it.unitn.disi.webarch.tinyhttpd;
+
+public class ReverseString {
+    public static void main(String[] a){
+        String inputString = a[0];
+        if(inputString == null) System.out.println("ERROR: no params given");
+        System.out.println(new StringBuilder(inputString).reverse());
+    }
+}
+\end{lstlisting}

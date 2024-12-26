@@ -1,0 +1,26 @@
+\subsection{Main.java code}
+\begin{lstlisting}[language=java, caption={method to get the user from the session}]
+public static synchronized UserSession getUserSession(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    HttpSession session = req.getSession();
+    String username = (String) session.getAttribute("username");
+    if(username == null) {
+        res.sendRedirect("login");
+        return null;
+    }
+    int points = (int) session.getAttribute("points");
+    return new UserSession(username, points);
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java, caption={GET method for main page}]
+@Override
+public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    UserSession user = getUserSession(req, res);
+    if (user == null) return;
+    if (user.getUsername().equals(Admin.ADMIN_USERNAME)) {
+        res.sendRedirect("admin");
+        return;
+    }
+
+    req.getRequestDispatcher("jsp/main.jsp").forward(req, res);
+}
+\end{lstlisting}

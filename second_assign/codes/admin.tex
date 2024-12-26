@@ -1,0 +1,29 @@
+\subsection{Admin.java code}
+\begin{lstlisting}[language=java, caption={method to get the logged users in the context}]
+public List<UserSession> getLoggedUser() {
+    synchronized (getServletContext()) {
+        ServletContext context = getServletContext();
+        Object loggedAttribute = context.getAttribute("logged");
+        @SuppressWarnings("unchecked")
+        List<UserSession> logged = (ArrayList<UserSession>) loggedAttribute;
+        Collections.sort(logged);
+        return logged;
+    }
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java, caption={GET method for admin page}]
+@Override
+protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    UserSession user = Main.getUserSession(req, res);
+    if (user == null) return;
+    if (!user.getUsername().equals(ADMIN_USERNAME)) {
+        res.setStatus(401);
+        req.getRequestDispatcher("jsp/unauthorized.jsp").forward(req, res);
+        return;
+    }
+
+    List<UserSession> logged = getLoggedUser();
+    req.setAttribute("logged", logged);
+    req.getRequestDispatcher("jsp/admin.jsp").forward(req, res);
+}
+\end{lstlisting}

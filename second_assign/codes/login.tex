@@ -1,0 +1,83 @@
+\subsection{Login.java code}
+\begin{lstlisting}[language=java, caption={method to get the user credentials from the context}]
+public static synchronized List<UserCredentials> getUsersFromContext(ServletContext context) {
+    Object usersAttribute =  context.getAttribute("users");
+    @SuppressWarnings("unchecked")
+    List<UserCredentials> userCredentials = (List<UserCredentials>) usersAttribute;
+    return userCredentials;
+}
+\end{lstlisting}
+\begin{lstlisting}[language=java, caption={method to set the user session}]
+public static synchronized void setSession(HttpServletRequest req, String username, ServletContext context){
+    System.out.println("started session for " + username);
+
+    Object loggedAttribute =  context.getAttribute("logged");
+    @SuppressWarnings("unchecked")
+    List<UserSession> logged = (ArrayList<UserSession>) loggedAttribute;
+    if (logged == null) logged = new ArrayList<>();
+
+    HttpSession session = req.getSession();
+
+    // if the user already had a session
+    String old_username = (String) session.getAttribute("username");
+    if (old_username != null) {
+        System.out.println("old login to delete: " + old_username);
+        UserSession old_session = new UserSession(old_username, 0);
+        logged.remove(old_session);
+    }
+
+    session.setAttribute("username", username);
+    session.setAttribute("points", 0);
+    UserSession new_session = new UserSession(username, 0);
+
+    logged.add(new_session);
+    System.out.println("new context: " + logged);
+    System.out.println();
+    context.setAttribute("logged", logged);
+} 
+\end{lstlisting}
+\begin{lstlisting}[language=java, caption={POST method for login page}]
+protected void sendLoginForm(HttpServletRequest req, HttpServletResponse res, String error_msg) throws IOException, ServletException {
+      req.setAttribute("error_msg", error_msg);
+      req.getRequestDispatcher("jsp/login.jsp").forward(req, res);
+}
+
+@Override
+protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    String username = req.getParameter("username");
+    String password = req.getParameter("password");
+
+    List<UserCredentials> userCredentials;
+    synchronized (getServletContext()) {
+        ServletContext context = getServletContext();
+        userCredentials = getUsersFromContext(context);
+    }
+    Iterator<UserCredentials> iter = userCredentials.iterator();
+    boolean found = false;
+    while (iter.hasNext()) {
+        UserCredentials user = iter.next();
+        if (user.getUsername().equals(username)) {
+          found = true;
+          if (!user.getPassword().equals(password)) {
+              // password not correct
+              sendLoginForm(req, res, "Password not correct");
+              return;
+          }
+          // account verified
+          break;
+        }
+    }
+    if (!found) {
+        // username not found
+        sendLoginForm(req, res, "Username not found");
+        return;
+    }
+
+    synchronized (getServletContext()) {
+        ServletContext context = getServletContext();
+        setSession(req, username, context);
+    }
+
+    res.sendRedirect(req.getContextPath());
+}
+\end{lstlisting}

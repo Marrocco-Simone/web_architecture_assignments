@@ -1,0 +1,12 @@
+\begin{lstlisting}[language=bash,caption={file bash used to call ReverseString.java}]
+#!/bin/sh
+file="/home/simone/Java/Projects/MiniHTTPD-Marrocco/src/it/unitn/disi/webarch/tinyhttpd/ReverseString.java";
+query_value=${QUERY_STRING##*=};
+output=$(/home/simone/Java/openjdk-19_linux-x64_bin/jdk-19/bin/java $file $query_value);
+
+echo "Content-type: text/plain; charset=iso-8859-1";
+echo;
+echo "queries: $QUERY_STRING";
+echo "query value: $query_value";
+echo "output: $output";
+\end{lstlisting} 

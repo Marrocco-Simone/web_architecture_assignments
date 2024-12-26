@@ -1,0 +1,37 @@
+\begin{lstlisting}[language=java, caption={Code added inside run()}]
+///// old code
+if (req.endsWith("/") || req.equals("")) {
+  req = req + "index.html";
+}
+// ASSIGNMENT 1 - Marrocco Simone
+if (req.startsWith("process/")) {
+    // req should be 'process/reverse?query_name=query_value', otherwise error
+    String[] url = req.split("/");
+    if (url.length != 2){
+        sendErrorBadRequest(ps, req, "Too many page requested. Ask only one command");
+        return;
+    }
+    String[] command = url[1].split("\\?");
+    if (!command[0].equals("reverse")){
+        sendErrorBadRequest(ps, req, "Command not yet implemented");
+        return;
+    }
+    if (command.length != 2){
+        sendErrorBadRequest(ps, req, "No query given");
+        return;
+    }
+    String[] queries = command[1].split("[\\W]");
+    if (queries.length < 2){
+        sendErrorBadRequest(ps, req, "incorrect or null queries");
+        return;
+    }
+    String query_value = queries[1];
+    String output = callExternalProcess(query_value);
+    ps.print("HTTP/1.1 200 OK\r\n");
+    ps.print("Content-Type: text/html\r\n");
+    ps.print("\r\n");
+    ps.print(output);
+} else
+// OPEN REQUESTED FILE AND COPY IT TO CLIENT
+///// continue with old code
+\end{lstlisting}

@@ -1,0 +1,32 @@
+\begin{lstlisting}[language=java, caption={functions added to the class TinyHttpdConnection}]
+/** error page sent when bad request while processing a /process/ request */
+private void sendErrorBadRequest(PrintStream ps, String req, String error_msg) {
+    ps.print("HTTP/1.1 400 Bad Request\r\n\r\n");
+    ps.println(error_msg);
+    ps.println("The wrong URL: "+req);
+    System.out.println("400 Bad Request: " + req);
+}
+
+/** call the external process that uses another Java file */
+protected String callExternalProcess(String input) throws IOException {
+    /** the bash command used. Instead of a single String with spaces, we need an array of Strings */
+    String[] bash_command = {
+            "java",
+          "/home/simone/Java/Projects/MiniHTTPD-Marrocco/src/it/unitn/disi/webarch/tinyhttpd/ReverseString.java",
+            input
+    };
+
+    ProcessBuilder processBuilder = new ProcessBuilder();
+    processBuilder.command(bash_command);
+    Process process = processBuilder.start();
+    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+    StringBuilder stringBuilder = new StringBuilder();
+    String line = null;
+    while ( (line = bufferedReader.readLine()) != null) {
+        stringBuilder.append(line);
+        stringBuilder.append(System.getProperty("line.separator"));
+    }
+    String result = stringBuilder.toString();
+    return result;
+}
+\end{lstlisting}
